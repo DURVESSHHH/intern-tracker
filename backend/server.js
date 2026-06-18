@@ -13,9 +13,20 @@ const reportRoutes = require('./routes/reportRoutes');
 const app = express();
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(express.json());
-app.use(morgan('dev'));
+app.use(cors({
+  origin: function(origin, callback) {
+    const allowed = [
+      process.env.CLIENT_URL,
+      'http://localhost:3000',
+    ];
+    if (!origin || allowed.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
